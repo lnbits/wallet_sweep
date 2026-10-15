@@ -2,8 +2,8 @@
   "id": "wallet_sweep",
   "name": "Wallet Sweep",
   "short_description": "Gather funds from your wallets and optionally send them to a Lightning Address.",
-  "version": "0.1.1",
-  "min_lnbits_version": "1.6.2-rc2",
+  "version": "0.1.2",
+  "min_lnbits_version": "1.6.2",
   "extension_type": "wasm",
   "tile": "/ext-assets/wallet_sweep/assets/icon.png",
   "wasm": {
