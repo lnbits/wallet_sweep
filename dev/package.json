@@ -1,0 +1,12 @@
+{
+  "name": "lnbits-wallet-sweep-wasm",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/bundle.mjs && npx --yes @bytecodealliance/jco@1.37.0 componentize dist/index.bundle.js --disable all --enable clocks --enable random --enable stdio --wit ../wasm/lnbits-extension.wit --world-name wallet-sweep -o ../wasm/module.wasm",
+    "check": "node --check src/index.js && node --check src/logic.js && node --check ../static/bridge.js && node --check ../static/app.js && node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

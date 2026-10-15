@@ -1,0 +1,100 @@
+{
+  "operations": [
+    {
+      "op": "create_table",
+      "table": "quotes",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "type": "integer"
+        },
+        {
+          "name": "data_json",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op": "create_table",
+      "table": "plans",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "type": "integer"
+        },
+        {
+          "name": "data_json",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op": "create_table",
+      "table": "receipts",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "plan_id",
+          "type": "string"
+        },
+        {
+          "name": "step",
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "type": "integer"
+        },
+        {
+          "name": "data_json",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op": "create_table",
+      "table": "payouts",
+      "fields": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "plan_id",
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "type": "integer"
+        },
+        {
+          "name": "data_json",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op": "create_index",
+      "table": "receipts",
+      "name": "receipts_plan_id",
+      "field": "plan_id"
+    },
+    {
+      "op": "create_index",
+      "table": "payouts",
+      "name": "payouts_plan_id",
+      "field": "plan_id"
+    }
+  ]
+}

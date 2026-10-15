@@ -1,0 +1,285 @@
+:root {
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #e8edf3;
+  background: #10151b;
+  font-size: 15px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 24px 60px;
+}
+h1 {
+  margin: 6px 0 8px;
+  font-size: clamp(30px, 5vw, 44px);
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+}
+h2 {
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  margin: 8px 0 22px;
+}
+p {
+  line-height: 1.6;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.eyebrow {
+  color: #7dd3c5;
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  font-weight: 700;
+  margin: 0;
+}
+.muted {
+  color: #a5b2c1;
+}
+.small {
+  font-size: 12px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 20px;
+}
+.panel {
+  min-width: 0;
+  background: #18212b;
+  border: 1px solid #2b3948;
+  border-radius: 16px;
+  padding: 26px;
+  margin-bottom: 20px;
+}
+.button {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  padding: 12px 17px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.button.primary {
+  color: #08251f;
+  background: #7dd3c5;
+}
+.button.primary:hover {
+  background: #a2e8da;
+}
+.button.secondary {
+  color: #d8e2ed;
+  background: #263442;
+  border-color: #43556a;
+}
+.button.danger {
+  color: white;
+  background: #bd434b;
+}
+.button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #f3c36a;
+  outline-offset: 3px;
+}
+.full {
+  width: 100%;
+  margin-top: 12px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 18px 0;
+}
+.field-label {
+  font-size: 13px;
+  color: #cfdae6;
+}
+input:not([type='checkbox']),
+select {
+  width: 100%;
+  color: #edf3f9;
+  background: #101820;
+  border: 1px solid #435368;
+  border-radius: 9px;
+  padding: 13px;
+  font: inherit;
+}
+.checkbox {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 10px 0;
+  cursor: pointer;
+}
+input[type='checkbox'] {
+  accent-color: #7dd3c5;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.wallet-row,
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border-top: 1px solid #2b3948;
+  padding: 14px 0;
+}
+.wallet-row.destination {
+  color: #7dd3c5;
+}
+.wallet-amount {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.wallet-amount strong {
+  font-size: 14px;
+}
+.notice {
+  background: #1b303d;
+  border-left: 3px solid #699ebc;
+  padding: 13px 16px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+.notice.error {
+  background: #35232b;
+  border-color: #ed8991;
+  color: #ffbdc2;
+}
+.notice.success {
+  background: #19372e;
+  border-color: #7dd3a5;
+  color: #b0f0ce;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.breakdown {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th,
+td {
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 1px solid #2c3b4b;
+  vertical-align: top;
+}
+th {
+  color: #a5b2c1;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+td:first-child {
+  min-width: 160px;
+}
+.badge {
+  display: inline-block;
+  border: 1px solid #52647a;
+  border-radius: 20px;
+  padding: 4px 9px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.badge.success {
+  color: #a0e8c2;
+  border-color: #426e59;
+}
+.badge.failed,
+.badge.uncertain {
+  color: #ffb9be;
+  border-color: #8c5058;
+}
+.badge.skipped {
+  color: #acb7c4;
+}
+.hash {
+  overflow-wrap: anywhere;
+  max-width: 240px;
+  margin-top: 9px;
+  color: #a5b2c1;
+}
+.address {
+  font-size: clamp(22px, 4vw, 34px);
+  font-weight: 650;
+  color: #f3c36a;
+  overflow-wrap: anywhere;
+}
+.payout-panel {
+  border-color: #705f40;
+}
+.payout-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 25px 0;
+}
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metric strong {
+  font-size: 20px;
+}
+.history-row p {
+  margin: 4px 0 0;
+}
+@media (max-width: 760px) {
+  main {
+    padding: 24px 14px;
+  }
+  .layout,
+  .payout-grid {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 20px 16px;
+  }
+  .header {
+    align-items: flex-start;
+  }
+  .wallet-row {
+    gap: 8px;
+  }
+  .wallet-amount strong {
+    font-size: 12px;
+  }
+  .actions .button {
+    flex: 1;
+  }
+}

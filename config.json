@@ -1,0 +1,141 @@
+{
+  "id": "wallet_sweep",
+  "name": "Wallet Sweep",
+  "short_description": "Gather funds from your wallets and optionally send them to a Lightning Address.",
+  "version": "0.1.0",
+  "min_lnbits_version": "1.6.2-rc1",
+  "extension_type": "wasm",
+  "tile": "/ext-assets/wallet_sweep/assets/icon.png",
+  "wasm": {
+    "module": "wasm/module.wasm",
+    "wit": "wasm/lnbits-extension.wit",
+    "world": "wallet-sweep",
+    "exports": [
+      {
+        "name": "get-wallets",
+        "visibility": "authenticated"
+      },
+      {
+        "name": "get-balance",
+        "visibility": "authenticated"
+      },
+      {
+        "name": "create-quote",
+        "visibility": "authenticated"
+      },
+      {
+        "name": "create-plan",
+        "visibility": "authenticated"
+      },
+      {
+        "name": "get-plan",
+        "visibility": "authenticated"
+      },
+      {
+        "name": "get-history",
+        "visibility": "authenticated"
+      },
+      {
+        "name": "consolidate",
+        "visibility": "authenticated"
+      },
+      {
+        "name": "prepare-payout",
+        "visibility": "authenticated"
+      },
+      {
+        "name": "send-payout",
+        "visibility": "authenticated"
+      }
+    ]
+  },
+  "ui_routes": [
+    {
+      "path": "/wallet_sweep",
+      "entrypoint": "ui/index.html",
+      "auth": "user"
+    }
+  ],
+  "api_routes": [
+    {
+      "method": "GET",
+      "path": "/wallets",
+      "export": "get-wallets",
+      "auth": "user"
+    },
+    {
+      "method": "POST",
+      "path": "/balance",
+      "export": "get-balance",
+      "auth": "user"
+    },
+    {
+      "method": "POST",
+      "path": "/quotes",
+      "export": "create-quote",
+      "auth": "user"
+    },
+    {
+      "method": "POST",
+      "path": "/plans",
+      "export": "create-plan",
+      "auth": "user"
+    },
+    {
+      "method": "GET",
+      "path": "/plan",
+      "export": "get-plan",
+      "auth": "user"
+    },
+    {
+      "method": "GET",
+      "path": "/history",
+      "export": "get-history",
+      "auth": "user"
+    },
+    {
+      "method": "POST",
+      "path": "/consolidate",
+      "export": "consolidate",
+      "auth": "user"
+    },
+    {
+      "method": "POST",
+      "path": "/payout/prepare",
+      "export": "prepare-payout",
+      "auth": "user"
+    },
+    {
+      "method": "POST",
+      "path": "/payout/send",
+      "export": "send-payout",
+      "auth": "user"
+    }
+  ],
+  "permissions": [
+    {
+      "id": "wallet.list",
+      "description": "List your wallets so you can select sources and a destination."
+    },
+    {
+      "id": "wallet.balance.read",
+      "description": "Preview balances and check available funds before a transfer."
+    },
+    {
+      "id": "wallet.create_invoice",
+      "description": "Create an invoice in your selected destination for each source wallet."
+    },
+    {
+      "id": "wallet.pay_invoice",
+      "description": "Move funds after you confirm; send externally only after a separate confirmation."
+    },
+    {
+      "id": "ext.storage.read",
+      "description": "Read your private sweep plans and payment receipts."
+    },
+    {
+      "id": "ext.storage.write",
+      "description": "Save your private plans, fixed invoices, and payment audit history."
+    }
+  ]
+}

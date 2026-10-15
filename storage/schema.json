@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "tables": {
+    "quotes": {
+      "fields": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "type": "integer"
+        },
+        {
+          "name": "data_json",
+          "type": "string"
+        }
+      ]
+    },
+    "plans": {
+      "fields": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "type": "integer"
+        },
+        {
+          "name": "data_json",
+          "type": "string"
+        }
+      ]
+    },
+    "receipts": {
+      "fields": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "plan_id",
+          "type": "string"
+        },
+        {
+          "name": "step",
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "type": "integer"
+        },
+        {
+          "name": "data_json",
+          "type": "string"
+        }
+      ]
+    },
+    "payouts": {
+      "fields": [
+        {
+          "name": "id",
+          "type": "string"
+        },
+        {
+          "name": "plan_id",
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "type": "integer"
+        },
+        {
+          "name": "data_json",
+          "type": "string"
+        }
+      ]
+    }
+  }
+}
