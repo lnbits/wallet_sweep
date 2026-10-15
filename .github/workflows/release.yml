@@ -1,0 +1,170 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Validate release tag
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 dev/scripts/validate_release.py --metadata-only --tag "$RELEASE_TAG"
+
+      - name: Check and build WASM
+        run: |
+          make check
+          make build
+
+      - name: Package and validate release files
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          make package
+          python3 dev/scripts/validate_release.py --tag "$RELEASE_TAG"
+
+      - name: Create GitHub release with installable assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          flags=()
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            flags+=(--prerelease)
+          fi
+          gh release create "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "$RELEASE_TAG" \
+            --generate-notes \
+            "${flags[@]}" \
+            dist/wallet_sweep-*.zip manifest.json
+
+  pullrequest:
+    name: Update WASM extension registry
+    needs: release
+    if: github.repository == 'lnbits/wallet_sweep'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check registry token
+        id: registry
+        env:
+          EXT_GITHUB: ${{ secrets.EXT_GITHUB }}
+        run: |
+          if [ -n "$EXT_GITHUB" ]; then
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'Registry update skipped: EXT_GITHUB is not configured.'
+          fi
+
+      - name: Checkout extension release
+        if: steps.registry.outputs.enabled == 'true'
+        uses: actions/checkout@v7
+        with:
+          path: extension
+          persist-credentials: false
+
+      - name: Checkout WASM extension registry
+        if: steps.registry.outputs.enabled == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: lnbits/lnbits-extensions-wasm
+          ref: main
+          path: registry
+          token: ${{ secrets.EXT_GITHUB }}
+
+      - name: Download and validate published release assets
+        if: steps.registry.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          release_dir="$RUNNER_TEMP/wallet-sweep-release"
+          gh release download "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'wallet_sweep-*.zip' \
+            --pattern manifest.json \
+            --dir "$release_dir"
+          python3 extension/dev/scripts/validate_release.py \
+            --tag "$RELEASE_TAG" \
+            --archive "$release_dir/wallet_sweep-${RELEASE_TAG#v}.zip" \
+            --manifest "$release_dir/manifest.json"
+
+      - name: Update extensions.json and open registry PR
+        if: steps.registry.outputs.enabled == 'true'
+        working-directory: registry
+        env:
+          GH_TOKEN: ${{ secrets.EXT_GITHUB }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          REGISTRY_BRANCH: update-wallet_sweep-${{ github.ref_name }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin "$REGISTRY_BRANCH" > /dev/null; then
+            git fetch origin "$REGISTRY_BRANCH"
+            git checkout -b "$REGISTRY_BRANCH" FETCH_HEAD
+          else
+            git checkout -b "$REGISTRY_BRANCH"
+          fi
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          import update_version
+
+          release_dir = Path(os.environ['RUNNER_TEMP']) / 'wallet-sweep-release'
+          entry = json.loads((release_dir / 'manifest.json').read_text())['extensions'][0]
+          tag = os.environ['RELEASE_TAG']
+          with ZipFile(release_dir / f'wallet_sweep-{tag[1:]}.zip') as archive:
+              root, config_name = update_version.validate_wasm_archive_layout(archive)
+              config = json.loads(archive.read(config_name))
+              update_version.validate_wasm_config('wallet_sweep', tag, tag[1:], archive, root, config)
+          update_version.update_manifest(
+              'wallet_sweep', tag, tag[1:], entry['repo'], entry['archive'], entry['hash'], config
+          )
+          PY
+          git add extensions.json
+          if ! git diff --cached --quiet; then
+            git commit -m "[UPDATE] wallet_sweep to $RELEASE_TAG"
+            git push origin "$REGISTRY_BRANCH"
+          fi
+          if git diff --quiet origin/main HEAD -- extensions.json; then
+            echo 'No registry changes.'
+            exit 0
+          fi
+          existing=$(gh pr list --repo lnbits/lnbits-extensions-wasm \
+            --head "$REGISTRY_BRANCH" --state open --json number --jq 'length')
+          if [ "$existing" = '0' ]; then
+            gh pr create --repo lnbits/lnbits-extensions-wasm \
+              --title "[UPDATE] wallet_sweep to $RELEASE_TAG" \
+              --body "Automated Wallet Sweep registry update using the validated runtime ZIP attached to release $RELEASE_TAG." \
+              --head "$REGISTRY_BRANCH" \
+              --base main
+          fi

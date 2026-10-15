@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check, build, and package WASM
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Check JavaScript and run unit tests
+        run: make check
+
+      - name: Build WASM
+        run: make build
+
+      - name: Package and validate release files
+        run: |
+          make package
+          make check-release
+
+      - name: Upload installable package and manifest
+        uses: actions/upload-artifact@v7
+        with:
+          name: wallet-sweep-package
+          path: |
+            dist/wallet_sweep-*.zip
+            manifest.json
+          if-no-files-found: error
+          retention-days: 14

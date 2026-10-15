@@ -13,3 +13,7 @@ check-host:
 .PHONY: package
 package:
 	python3 dev/scripts/package.py
+
+.PHONY: check-release
+check-release:
+	python3 dev/scripts/validate_release.py

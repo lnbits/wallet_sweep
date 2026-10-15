@@ -42,6 +42,7 @@ make check
 make build
 make check-host LNBITS_ROOT=../lnbits
 make package
+make check-release
 ```
 
 `make check` runs syntax checks and payment-logic unit tests. `make check-host` uses the adjacent LNbits Python environment to instantiate the compiled component through the real host bindings, test SQLite migrations and account boundaries, and execute both payment phases with mocked backend calls. It creates a temporary database and never accesses live funds.
@@ -49,6 +50,18 @@ make package
 `make package` creates `dist/wallet_sweep-0.1.0.zip` with a single `wallet_sweep/` runtime directory and prints its SHA-256. The packager also writes `manifest.json` with the artifact hash and the expected GitHub release-asset URL for the version tag. Publish that ZIP at the declared URL before distributing the manifest. Use this artifact for releases: the automatic GitHub source archive includes Python development helpers that the WASM installer rejects.
 
 To use a source checkout, preserve the symlink at `data/wasm_extensions/wallet_sweep` and restart or reload extensions through LNbits' normal workflow. Installation, administrator permission approval, user activation, and database migration must complete before use. Merely building the files does not activate a running instance.
+
+## GitHub Actions
+
+The workflows follow Pricebot's check/build pipeline and the tag-release/registry pattern used by PaySplit and BigPayment.
+
+- **CI** runs `make check`, `make build`, `make package`, and `make check-release` on branch pushes and pull requests. It uploads the installable ZIP and its generated manifest as an artifact.
+- **Release** runs on version tags such as `v0.1.0` or `v0.2.0-rc1`. The tag must match `config.json`. Checks and a fresh build must pass before publishing the runtime ZIP and `manifest.json` as GitHub release assets. Prerelease tags create prereleases.
+- **Registry update** runs after a successful release from `lnbits/wallet_sweep` when the `EXT_GITHUB` repository secret is configured. It validates the downloaded release assets and opens a PR against `lnbits/lnbits-extensions-wasm` using the runtime asset URL and checksum. Without that secret, registry updating is skipped and the release still succeeds.
+
+The built-in `GITHUB_TOKEN` publishes releases; `EXT_GITHUB` needs access to push a branch and open a PR in the registry. No workflow creates or stores a token. GitHub-hosted Ubuntu runners use Node.js 22 and the pinned jco toolchain. `make check-host` remains a local integration check requiring a compatible LNbits checkout and Python environment.
+
+The registry's normal `util.sh update_extension` helper downloads the GitHub source archive. These workflows use the registry's validation and manifest-update functions with the published runtime ZIP instead, since Wallet Sweep's Python development helpers are not allowed in an installable WASM archive. Existing registry version-boundary behavior is preserved.
 
 ## API
 

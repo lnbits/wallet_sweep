@@ -5,7 +5,7 @@
       "name": "Wallet Sweep",
       "version": "0.1.0",
       "archive": "https://github.com/lnbits/wallet_sweep/releases/download/v0.1.0/wallet_sweep-0.1.0.zip",
-      "hash": "08095139d1437de9cd9846be7d2522557591a35ba8cc871d3001febb201aff1e",
+      "hash": "2313a373d6bd42fd1239a08c40c808f4ae3d95464090bd4adfcef6186e92408b",
       "repo": "https://github.com/lnbits/wallet_sweep",
       "icon": "https://raw.githubusercontent.com/lnbits/wallet_sweep/v0.1.0/static/assets/icon.png",
       "short_description": "Gather funds from your wallets and optionally send them to a Lightning Address.",
