@@ -218,7 +218,8 @@ async def main():
         assert len(calls) == 2
         assert balances["source"] == 10_500
         assert balances["destination"] == 1_002_000
-    artifact = ROOT / "dist/wallet_sweep-0.1.0.zip"
+    version = json.loads((ROOT / "config.json").read_text())["version"]
+    artifact = ROOT / "dist" / f"wallet_sweep-{version}.zip"
     if artifact.exists():
         metadata = InstallableExtension.from_wasm_ext_dir("wallet_sweep")
         assert metadata
