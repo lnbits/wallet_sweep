@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/bundle.mjs && npx --yes @bytecodealliance/jco@1.37.0 componentize dist/index.bundle.js --disable all --enable clocks --enable random --enable stdio --wit ../wasm/lnbits-extension.wit --world-name wallet-sweep -o ../wasm/module.wasm",
-    "check": "node --check src/index.js && node --check src/logic.js && node --check ../static/bridge.js && node --check ../static/app.js && node --test test/*.test.js"
+    "build": "node scripts/build-wasm.mjs",
+    "check": "cargo fmt --check && cargo check --locked --target wasm32-wasip2 && npm run test:prepare && node --check ../static/bridge.js && node --check ../static/app.js && node --test test/*.test.js",
+    "test:prepare": "npx --yes @bytecodealliance/jco@1.37.0 transpile ../wasm/module.wasm --instantiation sync --no-wasi-shim --name guest -o target/test-component"
   },
   "engines": {
     "node": ">=22"

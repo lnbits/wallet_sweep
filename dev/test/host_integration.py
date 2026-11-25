@@ -53,6 +53,7 @@ async def main():
         amount = balances[wallet_id]
         return SimpleNamespace(
             id=wallet_id,
+            source_wallet_id=wallet_id,
             user="bob" if wallet_id == "foreign" else "alice",
             name=wallet_id.title(),
             currency=None,
@@ -60,16 +61,21 @@ async def main():
             balance=amount // 1000,
             withdrawable_balance=max(0, amount - 2000),
             can_send_payments=True,
+            can_receive_payments=True,
+            deleted=False,
+            is_onchain_wallet=False,
+            wallet_type="lightning",
+            onchain_network=None,
         )
 
-    async def get_wallets(user_id):
+    async def get_wallets(user_id, wallet_type=None):
         return [
             await get_wallet(key)
             for key in balances
             if (key == "foreign") == (user_id == "bob")
         ]
 
-    async def create_invoice(wallet_id, data):
+    async def create_invoice(wallet_id, data, extension_context=None):
         key = f"invoice_{len(invoices)}"
         invoices[key] = (wallet_id, int(data.amount) * 1000)
         return SimpleNamespace(
