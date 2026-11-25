@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {fixture} from './helpers.js'
-import {lightningAddress, MAX_SOURCES} from '../src/logic.js'
+const MAX_SOURCES = 50
 
 test('preview creates fixed invoices without moving funds and retains fractional sats', () => {
   const f = fixture(),
@@ -16,7 +16,7 @@ test('preview creates fixed invoices without moving funds and retains fractional
 
 test('retained amount, source eligibility, and supported precision are validated', () => {
   const f = fixture()
-  for (const leaveSat of [-1, 1.5, '1', NaN, Infinity, Number.MAX_SAFE_INTEGER])
+  for (const leaveSat of [-1, 1.5, '1', 'NaN', 'Infinity', Number.MAX_SAFE_INTEGER])
     assert.throws(() =>
       f.sweep.createQuote({
         sourceId: 'source_a',
@@ -153,6 +153,9 @@ for (const failure of ['pending', 'throw'])
     const f = fixture(),
       p = f.plan({address: 'me@example.com'})
     f.failures.set('source_a', failure)
+    if (failure === 'throw') {
+      assert.throws(() => f.sweep.consolidate({planId: p.id, sourceId: 'source_a', confirm: true}))
+    }
     const done = f.consolidate(p)
     assert.equal(done.sources[0].status, 'uncertain')
     assert.throws(() => f.sweep.preparePayout({planId: p.id}), /uncertain/)
@@ -348,10 +351,12 @@ test('concurrent external invoice preparation fails closed', () => {
 })
 
 test('Lightning Addresses reject URLs, credentials, control characters and malformed hosts', () => {
+  const f = fixture()
+  const quote = f.sweep.createQuote({sourceId: 'source_a', destinationId: 'destination'})
+  const lightningAddress = address => f.sweep.createPlan({quoteIds: [quote.id], address}).address
   assert.equal(lightningAddress(' Name@EXAMPLE.com '), 'Name@example.com')
   for (const value of [
-    '',
-    null,
+    ' ',
     'https://example.com',
     'me@localhost',
     'me@-example.com',

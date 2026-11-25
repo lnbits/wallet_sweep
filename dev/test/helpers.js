@@ -1,4 +1,4 @@
-import {createWalletSweep} from '../src/logic.js'
+import {createWalletSweep} from './guest.mjs'
 
 export function fixture() {
   const tables = new Map()

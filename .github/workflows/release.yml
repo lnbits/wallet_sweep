@@ -35,6 +35,8 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: python3 dev/scripts/validate_release.py --metadata-only --tag "$RELEASE_TAG"
 
+      - run: rustup target add wasm32-wasip2
+
       - name: Check and build WASM
         run: |
           make check

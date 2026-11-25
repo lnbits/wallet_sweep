@@ -28,7 +28,9 @@ jobs:
           node-version: 22
           package-manager-cache: false
 
-      - name: Check JavaScript and run unit tests
+      - run: rustup target add wasm32-wasip2
+
+      - name: Check the guest, frontend, and payment tests
         run: make check
 
       - name: Build WASM

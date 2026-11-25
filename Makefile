@@ -1,7 +1,7 @@
 LNBITS_ROOT ?= ../lnbits
 
 .PHONY: check build check-host
-check:
+check: build
 	cd dev && npm run check
 
 build:
